@@ -19,10 +19,13 @@ public class cosmos extends LinearOpMode
     private CRServo blocker;
     private Limelight3A limelight;
 
+    //other stuff? pls add
+    private double driveSensitivity = 1;
 
     @Override
     public void runOpMode()
     {
+        waitForStart();
         //hardware maps
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
@@ -38,6 +41,12 @@ public class cosmos extends LinearOpMode
         blocker = hardwareMap.get(CRServo.class, "blocker");
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0); //0 is blue 1 is red
+
+
+
+
+
 
     }
 
