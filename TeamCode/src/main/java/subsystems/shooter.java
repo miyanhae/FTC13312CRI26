@@ -22,23 +22,43 @@ public class shooter extends LinearOpMode {
 
         shooter2.setDirection(DcMotor.Direction.REVERSE);
 
-        //hood
-        if(gamepad2.dpad_down) {
+
+
+    }
+    //hood
+    public void initPosition(Servo hood){
+        if(gamepad2.dpad_down)
+        {
             hood.setPosition(0.25);
         }
-        if(gamepad2.dpad_up) {
+    }
+
+    public void finPosition(Servo hood)
+    {
+        if(gamepad2.dpad_up)
+        {
             hood.setPosition(0.75);
         }
+    }
 
-
-        //gate
+    //gate
+    public void closeGate(Servo gate)
+    {
         if(gamepad2.right_bumper){
             gate.setPosition(0.5);
         }
+    }
+
+    public void openGate(Servo gate)
+    {
         if(gamepad2.left_bumper){
             gate.setPosition(0.0);
         }
+    }
 
+    //shooter
+    public void shoot(DcMotor shooter1, DcMotor shooter2)
+    {
         //shooter toggle
         if(gamepad2.y){
             strength = -0.2;
@@ -58,6 +78,5 @@ public class shooter extends LinearOpMode {
 
         shooter1.setPower(strength);
         shooter2.setPower(strength);
-
     }
 }
