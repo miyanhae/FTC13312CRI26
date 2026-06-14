@@ -5,41 +5,45 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+
+import subsystems.Drivebase;
+import subsystems.Intake;
+import subsystems.Shooter;
 
 @TeleOp(name = "cosmos", group = "LinearOpMode")
 public class cosmos extends LinearOpMode
 {
     //Variables
     private DcMotor leftFront, leftBack, rightFront, rightBack;
-    private DcMotor shooter1, shooter2;
-    private CRServo turret1, turret2;
-    private CRServo hood;
-    private CRServo blocker;
+    private DcMotorEx shooter1, shooter2;
+    private Servo turret1, turret2;
+    private Servo hood;
+    private Servo blocker;
     private Limelight3A limelight;
-
-    //other stuff? pls add
-    private double driveSensitivity = 1;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
+
         waitForStart();
+
         //hardware maps
         leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
 
-        shooter1 = hardwareMap.get(DcMotor.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
+        hood = hardwareMap.get(Servo.class, "hood");
+        blocker = hardwareMap.get(Servo.class, "blocker");
 
-        turret1 = hardwareMap.get(CRServo.class, "turret1");
-        turret2 = hardwareMap.get(CRServo.class, "turret2");
-        hood = hardwareMap.get(CRServo.class, "hood");
-        blocker = hardwareMap.get(CRServo.class, "blocker");
+        turret1 = hardwareMap.get(Servo.class, "turret1");
+        turret2 = hardwareMap.get(Servo.class, "turret2");
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0); //0 is blue 1 is red
@@ -48,44 +52,69 @@ public class cosmos extends LinearOpMode
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);
 
+        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        shooter2.setDirection(DcMotorEx.Direction.REVERSE);
+        shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(0, 0, 0, 0);
+        shooter1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        shooter2.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
 
-
-
-
-        //start polling for data
-        limelight.start();
+        Drivebase drivebase = new Drivebase();
+        Intake intake = new Intake();
+        Shooter shooter = new Shooter();
 
         while (opModeIsActive())
         {
-            double drivePower = -gamepad1.left_stick_y;
-            double turnPower = gamepad1.right_stick_x;
-            double strafePower = gamepad1.left_stick_x;
 
-            double lfPower = Range.clip(drivePower + turnPower + strafePower, -driveSensitivity, driveSensitivity);
-            double rfPower = Range.clip(drivePower - turnPower - strafePower, -driveSensitivity, driveSensitivity);
-            double lbPower = Range.clip(drivePower + turnPower - strafePower, -driveSensitivity, driveSensitivity);
-            double rbPower = Range.clip(drivePower - turnPower + strafePower, -driveSensitivity, driveSensitivity);
+            drivebase.drive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
+
+            intake.powerIntake(gamepad2.right_stick_y);
 
 
 
+            //shooting motor controls below
 
-            //get most recent frame of data caught by camera
-            //this code is literally just from the limelight documentation
-            LLResult result = limelight.getLatestResult();
-            if (result != null)
-            {
-                if(result.isValid())
-                {
-                    Pose3D botpose = result.getBotpose();
-                    telemetry.addData("tx", result.getTx());
-                    telemetry.addData("ty", result.getTy());
-                    telemetry.addData("Botpose", botpose.toString());
-                }
+            if(gamepad2.a){
+                shooter.stopShooter();
             }
-        }
-    }
+            if (gamepad2.b) {
+                shooter.shotRangeFar();
+            }
+            if (gamepad2.y) {
+                shooter.shotRangeMedium();
+            }
+            if (gamepad2.x) {
+                shooter.shotRangeShort();
+            }
 
+            //Hood controls below
+
+            if(gamepad2.dpad_left){
+                shooter.launchAngle1();
+            }
+            if(gamepad2.dpad_up){
+                shooter.launchAngle2();
+            }
+            if(gamepad2.dpad_right){
+                shooter.launchAngle3();
+            }
+            if(gamepad2.dpad_down){
+                shooter.launchAngle4();
+            }
+
+
+
+            if (gamepad2.right_bumper){
+                shooter.toggleGate();
+            }
+
+        }
+
+    }
 }
 
 
