@@ -6,7 +6,7 @@ public class Intake {
 
     private DcMotor intakeMotor;
 
-    public void powerIntake( double intakePower)
+    public void powerIntake(double intakePower)
     {
         intakeMotor.setPower(intakePower);
     }

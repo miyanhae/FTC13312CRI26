@@ -7,44 +7,44 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class Shooter {
-    private DcMotorEx shooter1, shooter2;
+    private DcMotorEx shooterMotor1, shooterMotor2;
     private Servo gate, hood;
-    boolean openGateCheck = true;
 
 
     public void shotRangeShort()
     {
-        shooter1.setVelocity(1000);
-        shooter2.setVelocity(1000);
+        shooterMotor1.setVelocity(1000);
+        shooterMotor2.setVelocity(1000);
     }
     public void shotRangeMedium()
     {
-        shooter1.setVelocity(1500);
-        shooter2.setVelocity(1500);
+        shooterMotor1.setVelocity(1500);
+        shooterMotor2.setVelocity(1500);
 
     }
     public void shotRangeFar()
     {
-        shooter1.setVelocity(2000);
-        shooter2.setVelocity(2000);
+        shooterMotor1.setVelocity(2000);
+        shooterMotor2.setVelocity(2000);
     }
     public void stopShooter()
     {
-        shooter1.setVelocity(0);
-        shooter2.setVelocity(0);
+        shooterMotor1.setVelocity(0);
+        shooterMotor2.setVelocity(0);
     }
 
 
 
-    public void toggleGate() {
-        if (openGateCheck == true) {
+    public void closeGate() {
             gate.setPosition(0.0);
-            openGateCheck = false;
-        } else if (openGateCheck == false) {
-            gate.setPosition(0.5);
-            openGateCheck = true;
         }
+
+    public void openGate() {
+        gate.setPosition(0.5);
     }
+
+
+
 
 
 

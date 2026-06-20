@@ -15,13 +15,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import subsystems.Drivebase;
 import subsystems.Intake;
 import subsystems.Shooter;
+import subsystems.Transfer;
 
 @TeleOp(name = "cosmos", group = "LinearOpMode")
 public class cosmos extends LinearOpMode
 {
     //Variables
     private DcMotor leftFront, leftBack, rightFront, rightBack;
-    private DcMotorEx shooter1, shooter2;
+    private DcMotorEx shooterMotor1, shooterMotor2;
     private Servo turret1, turret2;
     private Servo hood;
     private Servo blocker;
@@ -52,20 +53,21 @@ public class cosmos extends LinearOpMode
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);
 
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-        shooter2.setDirection(DcMotorEx.Direction.REVERSE);
-        shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        shooter2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooterMotor1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+        shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        shooterMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+        shooterMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(0, 0, 0, 0);
-        shooter1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        shooter2.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        shooterMotor1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        shooterMotor2.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
 
         Drivebase drivebase = new Drivebase();
         Intake intake = new Intake();
         Shooter shooter = new Shooter();
+        Transfer transfer = new Transfer();
 
         while (opModeIsActive())
         {
@@ -73,6 +75,7 @@ public class cosmos extends LinearOpMode
             drivebase.drive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
 
             intake.powerIntake(gamepad2.right_stick_y);
+            transfer.powerTransfer(gamepad2.left_stick_y);
 
 
 
@@ -107,10 +110,12 @@ public class cosmos extends LinearOpMode
             }
 
 
-
-            if (gamepad2.right_bumper){
-                shooter.toggleGate();
+            if(gamepad2.right_trigger >= 0.5){
+                shooter.openGate();
+            } else {
+                shooter.closeGate();
             }
+
 
         }
 
