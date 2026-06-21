@@ -58,8 +58,8 @@ public class AutoAimTurret {
 
     public void aimTurret(){
         //one is + and other is _ because they need to spin in opposite directions
-        turretR1.setPosition(0.5+ (-1*(getNeededTurretAdjustment())-getRobotHeading())/360);
-        turretR2.setPosition(0.5- (-1*(getNeededTurretAdjustment())-getRobotHeading())/360);
+        turretR1.setPosition(0.5+ (getNeededTurretAdjustment()-getRobotHeading())/360);
+        turretR2.setPosition(0.5- (getNeededTurretAdjustment()-getRobotHeading())/360);
     }
 
 }
