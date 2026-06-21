@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class Drivebase {
 
-    private DcMotor leftFront, leftBack, rightFront, rightBack;
+    public DcMotor leftFront, leftBack, rightFront, rightBack;
 
     public void drive(double drivePower, double turnPower, double strafePower, double driveSensitivity) {
 

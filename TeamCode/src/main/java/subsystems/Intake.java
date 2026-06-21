@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class Intake {
 
-    private DcMotor intakeMotor;
+    public DcMotor intakeMotor;
 
     public void powerIntake(double intakePower)
     {

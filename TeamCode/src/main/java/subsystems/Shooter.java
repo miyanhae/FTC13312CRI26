@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 public class Shooter {
-    private DcMotorEx shooterMotor1, shooterMotor2;
-    private Servo gate, hood;
+    public DcMotorEx shooterMotor1, shooterMotor2;
+    public Servo gate, hood;
 
 
     public void closeGate() {

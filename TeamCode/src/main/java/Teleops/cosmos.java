@@ -1,4 +1,5 @@
 package Teleops;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -35,6 +36,40 @@ public class cosmos extends LinearOpMode
     public void runOpMode() throws InterruptedException
     {
 
+        turret.pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+
+
+        drivebase.leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+        drivebase.leftBack = hardwareMap.get(DcMotor.class, "leftBack");
+        drivebase.rightFront = hardwareMap.get(DcMotor.class, "rightFront");
+        drivebase.rightBack = hardwareMap.get(DcMotor.class, "rightBack");
+
+        shooter.shooterMotor1 = hardwareMap.get(DcMotorEx.class, "shooterMotor1");
+        shooter.shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooterMotor2");
+        shooter.hood = hardwareMap.get(Servo.class, "hood");
+        shooter.gate = hardwareMap.get(Servo.class, "gate");
+
+        turret.turretR1 = hardwareMap.get(Servo.class, "turretR1");
+        turret.turretR2 = hardwareMap.get(Servo.class, "turretR2");
+
+        intake.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        transfer.transferMotor = hardwareMap.get(DcMotor.class, "transferMotor");
+
+
+        drivebase.leftFront.setDirection(DcMotor.Direction.REVERSE);
+        drivebase.leftBack.setDirection(DcMotor.Direction.REVERSE);
+
+        shooter.shooterMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+        shooter.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooter.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(0, 0, 0, 0);
+        shooter.shooterMotor1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        shooter.shooterMotor2.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+
+
+
+
         Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
         Pose2D HPRed = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
 
@@ -49,6 +84,8 @@ public class cosmos extends LinearOpMode
 
         while (opModeIsActive())
         {
+
+            turret.pinpoint.update();
 
             drivebase.drive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
             intake.powerIntake(gamepad2.right_stick_y);

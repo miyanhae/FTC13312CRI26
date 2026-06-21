@@ -13,8 +13,8 @@ import org.opencv.core.Mat;
 import java.security.PublicKey;
 
 public class AutoAimTurret {
-    private Servo turretR1, turretR2;
-    private GoBildaPinpointDriver pinpoint;
+    public Servo turretR1, turretR2;
+    public GoBildaPinpointDriver pinpoint;
     public Pose2D goal;
 
 
