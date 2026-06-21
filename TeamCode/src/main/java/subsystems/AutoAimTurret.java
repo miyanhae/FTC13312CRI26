@@ -49,17 +49,17 @@ public class AutoAimTurret {
 
 
     public double getNeededTurretAdjustment(){
-        double distanceGoalFwdPod = Math.abs(goal.getX(DistanceUnit.INCH) - pinpoint.getPosX(DistanceUnit.INCH));
-        double distanceGoalLatPod = Math.abs(goal.getY(DistanceUnit.INCH) - pinpoint.getPosY(DistanceUnit.INCH));
+        double distanceGoalFwdPod = goal.getX(DistanceUnit.INCH) - pinpoint.getPosX(DistanceUnit.INCH);
+        double distanceGoalLatPod = goal.getY(DistanceUnit.INCH) - pinpoint.getPosY(DistanceUnit.INCH);
 
         //gives us the angle of horizontal axis to the line of the robot and goal. we can subtract this from 90 to see how much we need to turn the turret
-        return 90-Math.toDegrees(Math.atan(distanceGoalFwdPod/distanceGoalLatPod));
+        return 90-Math.toDegrees(Math.atan2(distanceGoalFwdPod, distanceGoalLatPod));
     }
 
     public void aimTurret(){
         //one is + and other is _ because they need to spin in opposite directions
-        turretR1.setPosition(0.5+ (-1*(getNeededTurretAdjustment())+getRobotHeading())/360);
-        turretR2.setPosition(0.5- (-1*(getNeededTurretAdjustment())+getRobotHeading())/360);
+        turretR1.setPosition(0.5+ (-1*(getNeededTurretAdjustment())-getRobotHeading())/360);
+        turretR2.setPosition(0.5- (-1*(getNeededTurretAdjustment())-getRobotHeading())/360);
     }
 
 }
