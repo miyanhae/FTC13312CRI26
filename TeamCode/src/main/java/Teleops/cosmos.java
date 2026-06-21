@@ -24,23 +24,16 @@ import subsystems.Transfer;
 @TeleOp(name = "cosmos", group = "LinearOpMode")
 public class cosmos extends LinearOpMode
 {
-    //Variables
-    private DcMotor leftFront, leftBack, rightFront, rightBack;
-    private DcMotorEx shooterMotor1, shooterMotor2;
-    private Servo turretR1, turretR2;
-    private Servo hood;
-    private Servo blocker;
-    private Limelight3A limelight;
+
+    Drivebase drivebase = new Drivebase();
+    Intake intake = new Intake();
+    Shooter shooter = new Shooter();
+    Transfer transfer = new Transfer();
+    AutoAimTurret turret = new AutoAimTurret();
 
     @Override
     public void runOpMode() throws InterruptedException
     {
-
-        Drivebase drivebase = new Drivebase();
-        Intake intake = new Intake();
-        Shooter shooter = new Shooter();
-        Transfer transfer = new Transfer();
-        AutoAimTurret turret = new AutoAimTurret();
 
         Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
         Pose2D HPRed = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
@@ -66,26 +59,26 @@ public class cosmos extends LinearOpMode
             //Sets up auto aim
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a){
                 turret.setupPinpoint(HPBlue);
-                turret.getNeededTurretAdjustment(BlueStandardGoal);
-                turret.aimTurret(BlueStandardGoal);
+                turret.setGoalLocation(BlueStandardGoal);
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.b){
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a){
                 turret.setupPinpoint(HPBlue);
-                turret.getNeededTurretAdjustment(BlueSpecialGoal);
-                turret.aimTurret(BlueSpecialGoal);
+                turret.setGoalLocation(BlueSpecialGoal);
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.y){
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a){
                 turret.setupPinpoint(HPRed);
-                turret.getNeededTurretAdjustment(RedStandardGoal);
-                turret.aimTurret(RedStandardGoal);
+                turret.setGoalLocation(RedStandardGoal);
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.x){
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a){
                 turret.setupPinpoint(HPRed);
-                turret.getNeededTurretAdjustment(RedSpecialGoal);
-                turret.aimTurret(RedSpecialGoal);
+                turret.setGoalLocation(RedSpecialGoal);
+            }
+
+            if(turret.goal != null) {
+            turret.aimTurret();
             }
 
 

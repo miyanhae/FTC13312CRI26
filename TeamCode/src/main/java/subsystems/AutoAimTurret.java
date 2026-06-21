@@ -15,6 +15,7 @@ import java.security.PublicKey;
 public class AutoAimTurret {
     private Servo turretR1, turretR2;
     private GoBildaPinpointDriver pinpoint;
+    public Pose2D goal;
 
 
 
@@ -34,29 +35,31 @@ public class AutoAimTurret {
         pinpoint.setPosition(origin);
     }
 
+    public void setGoalLocation(Pose2D goalPose) {
+        //sets goal for other functions to use
+        this.goal = goalPose;
+    }
+
+
 
 
     public double getRobotHeading(){
         return pinpoint.getHeading(AngleUnit.DEGREES);
     }
 
-    public double getTurretHeading(){
-        return turretR1.getPosition()*360;
-    }
 
-
-    public double getNeededTurretAdjustment(Pose2D goalCoordinates){
-        double distanceGoalFwdPod = Math.abs(goalCoordinates.getX(DistanceUnit.INCH) - pinpoint.getPosX(DistanceUnit.INCH));
-        double distanceGoalLatPod = Math.abs(goalCoordinates.getY(DistanceUnit.INCH) - pinpoint.getPosY(DistanceUnit.INCH));
+    public double getNeededTurretAdjustment(){
+        double distanceGoalFwdPod = Math.abs(goal.getX(DistanceUnit.INCH) - pinpoint.getPosX(DistanceUnit.INCH));
+        double distanceGoalLatPod = Math.abs(goal.getY(DistanceUnit.INCH) - pinpoint.getPosY(DistanceUnit.INCH));
 
         //gives us the angle of horizontal axis to the line of the robot and goal. we can subtract this from 90 to see how much we need to turn the turret
         return 90-Math.toDegrees(Math.atan(distanceGoalFwdPod/distanceGoalLatPod));
     }
 
-    public void aimTurret(Pose2D goalCoordinates){
+    public void aimTurret(){
         //one is + and other is _ because they need to spin in opposite directions
-        turretR1.setPosition(0.5+ (-1*(getNeededTurretAdjustment(goalCoordinates))+getRobotHeading())/360);
-        turretR2.setPosition(0.5- (-1*(getNeededTurretAdjustment(goalCoordinates))+getRobotHeading())/360);
+        turretR1.setPosition(0.5+ (-1*(getNeededTurretAdjustment())+getRobotHeading())/360);
+        turretR2.setPosition(0.5- (-1*(getNeededTurretAdjustment())+getRobotHeading())/360);
     }
 
 }
