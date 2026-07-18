@@ -1,4 +1,6 @@
-package Teleops;
+package org.firstinspires.ftc.teamcode.Teleops;
+
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,19 +9,17 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
-import subsystems.TargetingMath;
-import subsystems.Turret;
-import subsystems.Drivebase;
-import subsystems.Intake;
-import subsystems.Shooter;
-import subsystems.Transfer;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.Drivebase;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+import org.firstinspires.ftc.teamcode.subsystems.TargetMath;
 
 @TeleOp(name = "cosmos", group = "LinearOpMode")
-public class cosmos extends LinearOpMode
+public class Cosmos extends LinearOpMode
 {
 
     Drivebase drivebase = new Drivebase();
@@ -27,13 +27,15 @@ public class cosmos extends LinearOpMode
     Shooter shooter = new Shooter();
     Transfer transfer = new Transfer();
     Turret turret = new Turret();
-    TargetingMath targetingMath = new TargetingMath();
+    TargetMath targetingMath = new TargetMath();
+
+    Boolean manualTargeting = false;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
         targetingMath.pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-
+        targetingMath.follower = Constants.createFollower(hardwareMap);
 
         drivebase.leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         drivebase.leftBack = hardwareMap.get(DcMotor.class, "leftBack");
@@ -46,8 +48,6 @@ public class cosmos extends LinearOpMode
         shooter.gate = hardwareMap.get(Servo.class, "gate");
 
         turret.turretR1 = hardwareMap.get(Servo.class, "turretR1");
-        turret.turretR2 = hardwareMap.get(Servo.class, "turretR2");
-
         intake.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         transfer.transferMotor = hardwareMap.get(DcMotor.class, "transferMotor");
 
@@ -66,13 +66,13 @@ public class cosmos extends LinearOpMode
 
 
 
-        Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
-        Pose2D HPRed = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+        Pose HPBlue = new Pose(0, 0, 0);
+        Pose HPRed = new Pose(0, 0, 0);
 
-        Pose2D BlueStandardGoal = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
-        Pose2D BlueSpecialGoal = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
-        Pose2D RedStandardGoal = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
-        Pose2D RedSpecialGoal = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+        Pose BlueStandardGoal = new Pose(0, 0, 0);
+        Pose BlueSpecialGoal = new Pose(0, 0, 0);
+        Pose RedStandardGoal = new Pose(0, 0, 0);
+        Pose RedSpecialGoal = new Pose(0, 0, 0);
 
 
         waitForStart();
@@ -80,39 +80,50 @@ public class cosmos extends LinearOpMode
 
         while (opModeIsActive())
         {
-
-            targetingMath.pinpoint.update();
+            if(targetingMath.follower.getPose() != null) {
+                targetingMath.follower.update();
+            }
 
             drivebase.drive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
             intake.powerIntake(gamepad2.right_stick_y);
             transfer.powerTransfer(gamepad2.left_stick_y);
 
 
-
             //Sets up auto aim
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a){
-                targetingMath.setupPinpoint(HPBlue);
+                targetingMath.setKnownPositionForTargeting(HPBlue);
                 targetingMath.setGoalLocation(BlueStandardGoal);
             }
 
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.b){
-                targetingMath.setupPinpoint(HPBlue);
+                targetingMath.setKnownPositionForTargeting(HPBlue);
                 targetingMath.setGoalLocation(BlueSpecialGoal);
             }
 
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.y){
-                targetingMath.setupPinpoint(HPRed);
+                targetingMath.setKnownPositionForTargeting(HPRed);
                 targetingMath.setGoalLocation(RedStandardGoal);
             }
 
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.x){
-                targetingMath.setupPinpoint(HPRed);
+                targetingMath.setKnownPositionForTargeting(HPRed);
                 targetingMath.setGoalLocation(RedSpecialGoal);
             }
 
-            if(targetingMath.goal != null) {
-            turret.aimTurret();
+
+            if(gamepad2.rightStickButtonWasPressed() && gamepad2.leftStickButtonWasPressed()){
+                manualTargeting = !manualTargeting;
             }
+
+            if (targetingMath.follower.getPose() != null && targetingMath.goal != null && manualTargeting == false){
+                targetingMath.calculations();
+                turret.aimTurret();
+                //shooter.aimHood
+                //shooter.setFlywheelSpeed
+
+            }
+
+
 
 
 
