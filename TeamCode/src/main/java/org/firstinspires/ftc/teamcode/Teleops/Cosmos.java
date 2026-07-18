@@ -34,7 +34,6 @@ public class Cosmos extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        targetingMath.pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         targetingMath.follower = Constants.createFollower(hardwareMap);
 
         drivebase.leftFront = hardwareMap.get(DcMotor.class, "leftFront");

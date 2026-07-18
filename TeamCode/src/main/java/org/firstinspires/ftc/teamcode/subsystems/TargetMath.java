@@ -5,12 +5,10 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.MathFunctions;
 import com.pedropathing.math.Vector;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import static com.pedropathing.math.MathFunctions.clamp;
 
 public class TargetMath {
 
-    public GoBildaPinpointDriver pinpoint;
     public Follower follower;
     public Pose goal;
 
