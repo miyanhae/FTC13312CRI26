@@ -42,29 +42,29 @@ public class TargetMath {
 
 
     //Uncompensated for robot velocity, also the hood angle is on the side view plane
-    double hoodAngle = clamp(Math.atan(2 * controlHeight / distanceRobotToControl - Math.tan(controlAngle)), 0, 90);
+    double hoodAngle = clamp(Math.atan(2 * controlHeight / distanceRobotToControl - Math.tan(controlAngle)), 22.57, 47.57);
     double flywheelSpeed = Math.sqrt(g * distanceRobotToControl * distanceRobotToControl / (2 * Math.pow(Math.cos(hoodAngle), 2) * (distanceRobotToControl * Math.tan(hoodAngle - controlHeight))));
 
     //top view plane
     Vector robotVelocity = follower.getVelocity();
     double coordinateTheta = robotVelocity.getTheta() - robotToGoalVector.getTheta();
-    double xVelRobot = -Math.cos(coordinateTheta) * robotVelocity.getMagnitude();
-    double yVelRobot = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
+    double radialVelRobot = -Math.cos(coordinateTheta) * robotVelocity.getMagnitude();
+    double tangentialVelRobot = Math.sin(coordinateTheta) * robotVelocity.getMagnitude();
 
     //basic idea is we keep our airtime the same as before velocity compensating
-    //we find a new velocity to get to the new distance in the same amount of time
-    //new distance is based off the compensated velocity * airtime and then is used as an input for flywheel speed
+    //we find a new velocity to get to the new "distance" in the same amount of time
+    //new "distance" is based off the compensated velocity * airtime and then is used as an input for flywheel speed
 
     double yVelBall = flywheelSpeed * Math.sin(hoodAngle);
     double airtime = distanceRobotToControl / (flywheelSpeed * Math.cos(hoodAngle));
-    double adjustedXVelBall = distanceRobotToControl/airtime + xVelRobot;
-    double adjustedVelBall = Math.sqrt(adjustedXVelBall * adjustedXVelBall + yVelRobot * yVelRobot);
+    double adjustedXVelBall = distanceRobotToControl/airtime + radialVelRobot;
+    double adjustedVelBall = Math.sqrt(adjustedXVelBall * adjustedXVelBall + tangentialVelRobot * tangentialVelRobot);
     double compensatedDistanceRobotToGoal = adjustedVelBall * airtime;
-    double compensatedTurretOffset = Math.atan(yVelRobot/adjustedXVelBall);
+    double compensatedTurretOffset = Math.atan(tangentialVelRobot/adjustedXVelBall);
 
-    double compensatedHoodAngle= MathFunctions.clamp(Math.atan(yVelBall /adjustedVelBall),0,90);
-    double compensatedFlywheelSpeed = Math.sqrt(g * compensatedDistanceRobotToGoal * compensatedDistanceRobotToGoal / (2 * Math.pow(Math.cos(hoodAngle), 2) * (compensatedDistanceRobotToGoal * Math.tan(compensatedHoodAngle - controlHeight))));
-    double turretAngle = Math.toDegrees(follower.getHeading() - robotToGoalVector.getTheta() + compensatedTurretOffset);
+    double compensatedHoodAngle= MathFunctions.clamp(Math.atan(yVelBall /adjustedVelBall),22.57,47.57);
+    double compensatedFlywheelSpeed = Math.sqrt(g * compensatedDistanceRobotToGoal * compensatedDistanceRobotToGoal / (2 * Math.pow(Math.cos(compensatedHoodAngle), 2) * (compensatedDistanceRobotToGoal * Math.tan(compensatedHoodAngle - controlHeight))));
+    double turretAngle = MathFunctions.clamp(Math.toDegrees(follower.getHeading() - robotToGoalVector.getTheta() + compensatedTurretOffset), 45, 315);
 
     double calculatedTargetingValues[] = {compensatedHoodAngle, compensatedFlywheelSpeed, turretAngle};
             return calculatedTargetingValues;

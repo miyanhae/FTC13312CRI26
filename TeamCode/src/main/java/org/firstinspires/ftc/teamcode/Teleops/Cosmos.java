@@ -115,10 +115,9 @@ public class Cosmos extends LinearOpMode
             }
 
             if (targetingMath.follower.getPose() != null && targetingMath.goal != null && manualTargeting == false){
-                targetingMath.calculations();
                 turret.aimTurret();
-                //shooter.aimHood
-                //shooter.setFlywheelSpeed
+                shooter.aimHood();
+                shooter.setFlywheelVelocity();
 
             }
 

@@ -8,7 +8,7 @@ public class Transfer {
 
     public void powerTransfer(double transferPower)
     {
-        transferMotor.setPower(transferMotor);
+        transferMotor.setPower(transferPower);
     }
 
 }

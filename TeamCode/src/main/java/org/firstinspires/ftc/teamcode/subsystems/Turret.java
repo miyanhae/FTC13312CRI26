@@ -16,7 +16,9 @@ public class Turret {
 
 
     public void aimTurret(){
-        turretR1.setPosition(MathFunctions.clamp(targetingMath.calculations()[2], 2.5, 357.5)/360);
+
+        double turretAngleTicks =(targetingMath.calculations()[2]-45)/270;
+        turretR1.setPosition(turretAngleTicks);
     }
 
 }
