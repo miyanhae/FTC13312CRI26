@@ -46,16 +46,15 @@ public class Cosmos extends LinearOpMode
         shooter.hood = hardwareMap.get(Servo.class, "hood");
         shooter.gate = hardwareMap.get(Servo.class, "gate");
 
-        turret.turretR1 = hardwareMap.get(Servo.class, "turretR1");
+        turret.turretR1 = hardwareMap.get(Servo.class, "turretServo");
         intake.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         transfer.transferMotor = hardwareMap.get(DcMotor.class, "transferMotor");
-
 
         drivebase.leftFront.setDirection(DcMotor.Direction.REVERSE);
         drivebase.leftBack.setDirection(DcMotor.Direction.REVERSE);
 
         shooter.shooterMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-        shooter.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooter.shooterMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         shooter.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(0, 0, 0, 0);
@@ -65,13 +64,13 @@ public class Cosmos extends LinearOpMode
 
 
 
-        Pose HPBlue = new Pose(0, 0, 0);
-        Pose HPRed = new Pose(0, 0, 0);
+        Pose HPBlue = new Pose(8.75, 8.75, 0);
+        Pose HPRed = new Pose(183.25, 8.75, 0);
 
-        Pose BlueStandardGoal = new Pose(0, 0, 0);
-        Pose BlueSpecialGoal = new Pose(0, 0, 0);
-        Pose RedStandardGoal = new Pose(0, 0, 0);
-        Pose RedSpecialGoal = new Pose(0, 0, 0);
+        Pose BlueStandardGoal = new Pose(12, 180, 0);
+        Pose BlueSpecialGoal = new Pose(84, 180, 0);
+        Pose RedStandardGoal = new Pose(108, 180, 0);
+        Pose RedSpecialGoal = new Pose(180, 180, 0);
 
 
         waitForStart();
@@ -83,7 +82,7 @@ public class Cosmos extends LinearOpMode
                 targetingMath.follower.update();
             }
 
-            drivebase.drive(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
+            drivebase.drive(-1 * gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
             intake.powerIntake(gamepad2.right_stick_y);
             transfer.powerTransfer(gamepad2.left_stick_y);
 
@@ -114,6 +113,8 @@ public class Cosmos extends LinearOpMode
                 manualTargeting = !manualTargeting;
             }
 
+
+            //automatic hood, flywheel, and turret adjust
             if (targetingMath.follower.getPose() != null && targetingMath.goal != null && manualTargeting == false){
                 turret.aimTurret();
                 shooter.aimHood();
@@ -121,15 +122,62 @@ public class Cosmos extends LinearOpMode
 
             }
 
+            //manual hood and flywheel adjust
+            if(manualTargeting == true){
+
+                turret.setupTurret();
+
+                if (gamepad2.dpad_down) {
+                    shooter.hood.setPosition(0.25);
+                }
+
+                if (gamepad2.dpad_right) {
+                    shooter.hood.setPosition(0.5);
+                }
+
+                if (gamepad2.dpad_up) {
+                    shooter.hood.setPosition(0.75);
+                }
+
+                if (gamepad2.dpad_left) {
+                    shooter.hood.setPosition(1);
+                }
 
 
 
+                if (gamepad2.x) {
+                    shooter.shooterMotor1.setVelocity(0);
+                    shooter.shooterMotor1.setVelocity(0);
 
-            if(gamepad2.right_trigger >= 0.5){
-                shooter.openGate();
-            } else {
-                shooter.closeGate();
+                }
+
+                if (gamepad2.b) {
+                    shooter.shooterMotor1.setVelocity(2300);
+                    shooter.shooterMotor1.setVelocity(2300);
+
+                }
+
+                if (gamepad2.y) {
+                    shooter.shooterMotor1.setVelocity(1800);
+                    shooter.shooterMotor2.setVelocity(1800);
+
+                }
+
+                if (gamepad2.a) {
+                    shooter.shooterMotor1.setVelocity(1300);
+                    shooter.shooterMotor2.setVelocity(1300);
+                }
             }
+
+
+
+
+
+            //if(gamepad2.right_trigger >= 0.5){
+                //shooter.openGate();
+            //} else {
+                //shooter.closeGate();
+            //}
 
 
         }

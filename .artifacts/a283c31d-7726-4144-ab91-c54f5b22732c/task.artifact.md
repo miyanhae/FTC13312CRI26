@@ -1,0 +1,3 @@
+- [x] Fix `:FtcRobotController/build.gradle` structure
+- [x] Run Gradle Sync
+- [x] Verified sync success

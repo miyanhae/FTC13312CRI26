@@ -5,12 +5,16 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.MathFunctions;
 import com.pedropathing.math.Vector;
+
 import static com.pedropathing.math.MathFunctions.clamp;
+
+
 
 public class TargetMath {
 
     public Follower follower;
     public Pose goal;
+    public
 
     public void setGoalLocation(Pose goalPose) {
         //sets goal for other functions to use
