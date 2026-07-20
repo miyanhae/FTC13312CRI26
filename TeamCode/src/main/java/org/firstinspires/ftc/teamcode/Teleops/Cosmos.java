@@ -74,14 +74,21 @@ public class Cosmos extends LinearOpMode
 
 
         waitForStart();
-        turret.setupTurret();
+        turret.turretR1.setPosition(0.5);
 
         while (opModeIsActive())
         {
             follower.update();
+
             drivebase.drive(-1 * gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
             intake.powerIntake(gamepad2.right_stick_y);
             transfer.powerTransfer(gamepad2.left_stick_y);
+
+            telemetry.addData("flywheel speed", shooter.shooterMotor1.getVelocity());
+            telemetry.addData("hood angle", (shooter.hood.getPosition()*25)+22.57);
+            telemetry.addData("Turret heading", (turret.turretR1.getPosition()*180)+90);
+            telemetry.addData("Robot position", follower.getPose());
+            telemetry.update();
 
             //if(gamepad2.right_trigger >= 0.5){
             //shooter.openGate();
@@ -133,7 +140,7 @@ public class Cosmos extends LinearOpMode
             //manual hood and flywheel adjust
             if(manualTargeting == true){
 
-                turret.setupTurret();
+                turret.turretR1.setPosition(0.5);
 
                 if (gamepad2.dpad_down) {
                     shooter.hood.setPosition(0.25);

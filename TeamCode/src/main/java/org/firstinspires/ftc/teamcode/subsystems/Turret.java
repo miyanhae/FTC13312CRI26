@@ -7,12 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Turret {
     public Servo turretR1;
 
-    public void setupTurret(){
-        //sets turret to be facing directly away from robot intake, called once
-        turretR1.setPosition(0.5);
-    }
-
-
 
     public void aimTurret(double turretAngle){
 
