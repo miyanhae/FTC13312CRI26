@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleops;
 
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -27,14 +27,14 @@ public class Cosmos extends LinearOpMode
     Shooter shooter = new Shooter();
     Transfer transfer = new Transfer();
     Turret turret = new Turret();
-    TargetMath targetingMath = new TargetMath();
+    public TargetMath targetingMath = new TargetMath();
 
     Boolean manualTargeting = false;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
-        targetingMath.follower = Constants.createFollower(hardwareMap);
+        Follower follower = Constants.createFollower(hardwareMap);
 
         drivebase.leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         drivebase.leftBack = hardwareMap.get(DcMotor.class, "leftBack");
@@ -64,8 +64,8 @@ public class Cosmos extends LinearOpMode
 
 
 
-        Pose HPBlue = new Pose(8.75, 8.75, 0);
-        Pose HPRed = new Pose(183.25, 8.75, 0);
+        Pose HPBlue = new Pose(8.75, 8.75, 270);
+        Pose HPRed = new Pose(183.25, 8.75, 270);
 
         Pose BlueStandardGoal = new Pose(12, 180, 0);
         Pose BlueSpecialGoal = new Pose(84, 180, 0);
@@ -78,8 +78,7 @@ public class Cosmos extends LinearOpMode
 
         while (opModeIsActive())
         {
-
-            targetingMath.follower.update();
+            follower.update();
             drivebase.drive(-1 * gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
             intake.powerIntake(gamepad2.right_stick_y);
             transfer.powerTransfer(gamepad2.left_stick_y);
@@ -92,23 +91,23 @@ public class Cosmos extends LinearOpMode
 
 
             //Sets up auto aim
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a){
-                targetingMath.setKnownPositionForTargeting(HPBlue);
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.square){
+                follower.setPose(HPBlue);
                 targetingMath.setGoalLocation(BlueStandardGoal);
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.b){
-                targetingMath.setKnownPositionForTargeting(HPBlue);
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.cross){
+                follower.setPose(HPBlue);
                 targetingMath.setGoalLocation(BlueSpecialGoal);
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.y){
-                targetingMath.setKnownPositionForTargeting(HPRed);
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.triangle){
+                follower.setPose(HPRed);
                 targetingMath.setGoalLocation(RedStandardGoal);
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.x){
-                targetingMath.setKnownPositionForTargeting(HPRed);
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.circle){
+                follower.setPose(HPRed);
                 targetingMath.setGoalLocation(RedSpecialGoal);
             }
 
@@ -124,10 +123,10 @@ public class Cosmos extends LinearOpMode
 
 
             //automatic hood, flywheel, and turret adjust
-            if (targetingMath.follower.getPose() != null && targetingMath.goal != null && manualTargeting == false){
-                turret.aimTurret();
-                shooter.aimHood();
-                shooter.setFlywheelVelocity();
+            if (follower.getPose() != null && targetingMath.goal != null && manualTargeting == false){
+                turret.aimTurret(targetingMath.calculations(follower.getPose(), follower.getVelocity(), follower.getHeading())[2]);
+                shooter.aimHood(targetingMath.calculations(follower.getPose(), follower.getVelocity(), follower.getHeading())[0]);
+                shooter.setFlywheelVelocity(targetingMath.calculations(follower.getPose(), follower.getVelocity(), follower.getHeading())[1]);
 
             }
 
@@ -154,25 +153,25 @@ public class Cosmos extends LinearOpMode
 
 
 
-                if (gamepad2.a) {
+                if (gamepad2.square) {
                     shooter.shooterMotor1.setVelocity(0);
                     shooter.shooterMotor1.setVelocity(0);
 
                 }
 
-                if (gamepad2.b) {
+                if (gamepad2.cross) {
                     shooter.shooterMotor1.setVelocity(2300);
                     shooter.shooterMotor1.setVelocity(2300);
 
                 }
 
-                if (gamepad2.x) {
+                if (gamepad2.triangle) {
                     shooter.shooterMotor1.setVelocity(1800);
                     shooter.shooterMotor2.setVelocity(1800);
 
                 }
 
-                if (gamepad2.y) {
+                if (gamepad2.circle) {
                     shooter.shooterMotor1.setVelocity(1300);
                     shooter.shooterMotor2.setVelocity(1300);
                 }

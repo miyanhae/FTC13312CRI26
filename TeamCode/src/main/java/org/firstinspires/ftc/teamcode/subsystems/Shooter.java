@@ -9,8 +9,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 public class Shooter {
-    TargetMath targetingMath = new TargetMath();
-
     public DcMotorEx shooterMotor1, shooterMotor2;
     public Servo gate, hood;
 
@@ -21,9 +19,9 @@ public class Shooter {
         gate.setPosition(0.5);
     }
 
-    public void setFlywheelVelocity(){
+    public void setFlywheelVelocity(double compensatedFlywheelSpeed){
 
-        double flywheelVelocityRadsPerSec = targetingMath.calculations()[1] / 1.41731;
+        double flywheelVelocityRadsPerSec = compensatedFlywheelSpeed / 1.41731;
         //linear speed divided by radius of flywheel = angular speed
 
         shooterMotor1.setVelocity(flywheelVelocityRadsPerSec, AngleUnit.RADIANS);
@@ -31,9 +29,9 @@ public class Shooter {
     }
 
 
-    public void aimHood(){
+    public void aimHood(double compensatedHoodAngle){
 
-        double hoodAngleTicks = (targetingMath.calculations()[0] -22.57) /25;
+        double hoodAngleTicks = (compensatedHoodAngle -22.57) /25;
         hood.setPosition(hoodAngleTicks);
     }
 

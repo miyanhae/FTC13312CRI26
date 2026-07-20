@@ -3,10 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.pedropathing.math.MathFunctions;
 import com.qualcomm.robotcore.hardware.Servo;
 
+
 public class Turret {
     public Servo turretR1;
-    TargetMath targetingMath = new TargetMath();
-
 
     public void setupTurret(){
         //sets turret to be facing directly away from robot intake, called once
@@ -15,9 +14,9 @@ public class Turret {
 
 
 
-    public void aimTurret(){
+    public void aimTurret(double turretAngle){
 
-        double turretAngleTicks =(targetingMath.calculations()[2]-45)/270;
+        double turretAngleTicks = (turretAngle-90)/180;
         turretR1.setPosition(turretAngleTicks);
     }
 
