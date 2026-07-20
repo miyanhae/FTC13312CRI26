@@ -25,6 +25,7 @@ public class Cosmos extends LinearOpMode
     DcMotorEx shooterMotor1, shooterMotor2;
     Servo gate, hood, turret;
 
+    Boolean manualTargeting = false;
     Pose2D goal;
 
     @Override
@@ -85,7 +86,7 @@ public class Cosmos extends LinearOpMode
             transferMotor.setPower(gamepad2.left_stick_y);
 
             telemetry.addData("flywheel speed", shooterMotor1.getVelocity());
-            telemetry.addData("hood angle", (hood.getPosition()*25)+22.57);
+            telemetry.addData("hood angle", hood.getPosition());
             telemetry.addData("Turret heading", (turret.getPosition()*240)+60);
             telemetry.addData("Robot position", pinpoint.getPosition());
             telemetry.update();
@@ -120,16 +121,30 @@ public class Cosmos extends LinearOpMode
 
 
 
-            if(pinpoint.getPosition() != null && goal != null) {
+            if(gamepad2.rightStickButtonWasPressed() && manualTargeting == false){
+                manualTargeting = true;
+            }
+
+            if(gamepad2.leftStickButtonWasPressed() && manualTargeting == true){
+            manualTargeting = false;
+        }
+
+            if(pinpoint.getPosition() != null && goal != null && manualTargeting == false) {
                 double deltaY = (goal.getY(DistanceUnit.INCH)-pinpoint.getPosY(DistanceUnit.INCH));
                 double deltaX = (goal.getX(DistanceUnit.INCH)-pinpoint.getPosX(DistanceUnit.INCH));
                 if (deltaX!=0) {
-                    double goalHeadingFromRobot = Math.atan2(deltaY, deltaX);
+                    double goalHeadingFromXAxis = Math.toDegrees(Math.atan2(deltaY, deltaX));
                     double robotHeading = pinpoint.getHeading(AngleUnit.DEGREES);
-                    turret.setPosition((180+(goalHeadingFromRobot-robotHeading))/360);
-
+                    double turretRelativeToRobotHeading = AngleUnit.normalizeDegrees(goalHeadingFromXAxis - robotHeading - 180);
+                    turret.setPosition(0.5+(turretRelativeToRobotHeading/360));
                 }
             }
+
+            if (manualTargeting == true){
+                turret.setPosition(0.5);
+            }
+
+
 
                 if (gamepad2.dpad_down) {
                     hood.setPosition(0.25);
