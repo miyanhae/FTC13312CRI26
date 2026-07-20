@@ -95,22 +95,22 @@ public class Cosmos extends LinearOpMode
 
 
             //Sets up auto aim
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.square){
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a){
                 follower.setPose(HPBlue);
                 goal = BlueStandardGoal;
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.cross){
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.b){
                 follower.setPose(HPBlue);
                 goal = BlueSpecialGoal;
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.triangle){
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.x){
                 follower.setPose(HPRed);
                 goal = RedStandardGoal;
             }
 
-            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.circle){
+            if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.y){
                 follower.setPose(HPRed);
                 goal = RedSpecialGoal;
             }
