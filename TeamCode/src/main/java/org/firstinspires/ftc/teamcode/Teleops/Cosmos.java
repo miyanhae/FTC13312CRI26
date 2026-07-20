@@ -58,8 +58,8 @@ public class Cosmos extends LinearOpMode
         shooter.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(0, 0, 0, 0);
-        shooter.shooterMotor1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        shooter.shooterMotor2.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        //shooter.shooterMotor1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        //shooter.shooterMotor2.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
 
 
@@ -78,13 +78,17 @@ public class Cosmos extends LinearOpMode
 
         while (opModeIsActive())
         {
-            if(targetingMath.follower.getPose() != null) {
-                targetingMath.follower.update();
-            }
 
+            targetingMath.follower.update();
             drivebase.drive(-1 * gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
             intake.powerIntake(gamepad2.right_stick_y);
             transfer.powerTransfer(gamepad2.left_stick_y);
+
+            //if(gamepad2.right_trigger >= 0.5){
+            //shooter.openGate();
+            //} else {
+            //shooter.closeGate();
+            //}
 
 
             //Sets up auto aim
@@ -109,8 +113,13 @@ public class Cosmos extends LinearOpMode
             }
 
 
-            if(gamepad2.rightStickButtonWasPressed() && gamepad2.leftStickButtonWasPressed()){
-                manualTargeting = !manualTargeting;
+
+
+            if(gamepad2.rightStickButtonWasPressed() && manualTargeting==true){
+                manualTargeting = false;
+            }
+            if(gamepad2.leftStickButtonWasPressed() && manualTargeting==false){
+                manualTargeting = true;
             }
 
 
@@ -145,7 +154,7 @@ public class Cosmos extends LinearOpMode
 
 
 
-                if (gamepad2.x) {
+                if (gamepad2.a) {
                     shooter.shooterMotor1.setVelocity(0);
                     shooter.shooterMotor1.setVelocity(0);
 
@@ -157,34 +166,20 @@ public class Cosmos extends LinearOpMode
 
                 }
 
-                if (gamepad2.y) {
+                if (gamepad2.x) {
                     shooter.shooterMotor1.setVelocity(1800);
                     shooter.shooterMotor2.setVelocity(1800);
 
                 }
 
-                if (gamepad2.a) {
+                if (gamepad2.y) {
                     shooter.shooterMotor1.setVelocity(1300);
                     shooter.shooterMotor2.setVelocity(1300);
                 }
             }
 
 
-
-
-
-            //if(gamepad2.right_trigger >= 0.5){
-                //shooter.openGate();
-            //} else {
-                //shooter.closeGate();
-            //}
-
-
         }
-
-
 
     }
 }
-
-

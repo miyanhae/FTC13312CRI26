@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 
 public class Shooter {
     TargetMath targetingMath = new TargetMath();
@@ -21,17 +23,18 @@ public class Shooter {
 
     public void setFlywheelVelocity(){
 
-        double flywheelVelocityTicks = targetingMath.calculations()[1];
-        shooterMotor1.setVelocity(flywheelVelocityTicks);
-        shooterMotor2.setVelocity(flywheelVelocityTicks);
+        double flywheelVelocityRadsPerSec = targetingMath.calculations()[1] / 1.41731;
+        //linear speed divided by radius of flywheel = angular speed
+
+        shooterMotor1.setVelocity(flywheelVelocityRadsPerSec, AngleUnit.RADIANS);
+        shooterMotor2.setVelocity(flywheelVelocityRadsPerSec, AngleUnit.RADIANS);
     }
 
 
     public void aimHood(){
 
         double hoodAngleTicks = (targetingMath.calculations()[0] -22.57) /25;
-        shooterMotor1.setVelocity(hoodAngleTicks);
-        shooterMotor2.setVelocity(hoodAngleTicks);
+        hood.setPosition(hoodAngleTicks);
     }
 
 
