@@ -2,65 +2,53 @@ package org.firstinspires.ftc.teamcode.Teleops;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.MathFunctions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Turret;
-import org.firstinspires.ftc.teamcode.subsystems.Drivebase;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.subsystems.Transfer;
-import org.firstinspires.ftc.teamcode.subsystems.TargetMath;
+
 
 @TeleOp(name = "cosmos", group = "LinearOpMode")
 public class Cosmos extends LinearOpMode
 {
+    DcMotor leftFront, leftBack, rightFront, rightBack;
+    DcMotor intakeMotor, transferMotor;
+    DcMotorEx shooterMotor1, shooterMotor2;
+    Servo gate, hood, turret;
 
-    Drivebase drivebase = new Drivebase();
-    Intake intake = new Intake();
-    Shooter shooter = new Shooter();
-    Transfer transfer = new Transfer();
-    Turret turret = new Turret();
-    public TargetMath targetingMath = new TargetMath();
-
-    Boolean manualTargeting = false;
+    Pose goal;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
         Follower follower = Constants.createFollower(hardwareMap);
 
-        drivebase.leftFront = hardwareMap.get(DcMotor.class, "leftFront");
-        drivebase.leftBack = hardwareMap.get(DcMotor.class, "leftBack");
-        drivebase.rightFront = hardwareMap.get(DcMotor.class, "rightFront");
-        drivebase.rightBack = hardwareMap.get(DcMotor.class, "rightBack");
+        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+        leftBack = hardwareMap.get(DcMotor.class, "leftBack");
+        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
+        rightBack = hardwareMap.get(DcMotor.class, "rightBack");
 
-        shooter.shooterMotor1 = hardwareMap.get(DcMotorEx.class, "shooterMotor1");
-        shooter.shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooterMotor2");
-        shooter.hood = hardwareMap.get(Servo.class, "hood");
-        shooter.gate = hardwareMap.get(Servo.class, "gate");
+        shooterMotor1 = hardwareMap.get(DcMotorEx.class, "shooterMotor1");
+        shooterMotor2 = hardwareMap.get(DcMotorEx.class, "shooterMotor2");
+        hood = hardwareMap.get(Servo.class, "hood");
+        gate = hardwareMap.get(Servo.class, "gate");
 
-        turret.turretR1 = hardwareMap.get(Servo.class, "turretServo");
-        intake.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
-        transfer.transferMotor = hardwareMap.get(DcMotor.class, "transferMotor");
+        turret = hardwareMap.get(Servo.class, "turretServo");
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        transferMotor = hardwareMap.get(DcMotor.class, "transferMotor");
 
-        drivebase.leftFront.setDirection(DcMotor.Direction.REVERSE);
-        drivebase.leftBack.setDirection(DcMotor.Direction.REVERSE);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.REVERSE);
 
-        shooter.shooterMotor2.setDirection(DcMotorEx.Direction.REVERSE);
-        shooter.shooterMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        shooter.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(0, 0, 0, 0);
-        //shooter.shooterMotor1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        //shooter.shooterMotor2.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-
+        shooterMotor2.setDirection(DcMotorEx.Direction.REVERSE);
+        shooterMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
 
 
@@ -74,19 +62,28 @@ public class Cosmos extends LinearOpMode
 
 
         waitForStart();
-        turret.turretR1.setPosition(0.5);
+        turret.setPosition(0.5);
 
         while (opModeIsActive())
         {
             follower.update();
 
-            drivebase.drive(-1 * gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, 1.0);
-            intake.powerIntake(gamepad2.right_stick_y);
-            transfer.powerTransfer(gamepad2.left_stick_y);
+            double lfPower = Range.clip(-1 * gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x, -1, 1);
+            double rfPower = Range.clip(-1 * gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x, -1, 1);
+            double lbPower = Range.clip(-1 * gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x, -1, 1);
+            double rbPower = Range.clip(-1 * gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x, -1, 1);
 
-            telemetry.addData("flywheel speed", shooter.shooterMotor1.getVelocity());
-            telemetry.addData("hood angle", (shooter.hood.getPosition()*25)+22.57);
-            telemetry.addData("Turret heading", (turret.turretR1.getPosition()*180)+90);
+            leftFront.setPower(lfPower);
+            leftBack.setPower(lbPower);
+            rightFront.setPower(rfPower);
+            rightBack.setPower(rbPower);
+
+            intakeMotor.setPower(gamepad2.right_stick_y);
+            transferMotor.setPower(gamepad2.left_stick_y);
+
+            telemetry.addData("flywheel speed", shooterMotor1.getVelocity());
+            telemetry.addData("hood angle", (hood.getPosition()*25)+22.57);
+            telemetry.addData("Turret heading", (turret.getPosition()*240)+60);
             telemetry.addData("Robot position", follower.getPose());
             telemetry.update();
 
@@ -100,87 +97,76 @@ public class Cosmos extends LinearOpMode
             //Sets up auto aim
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.square){
                 follower.setPose(HPBlue);
-                targetingMath.setGoalLocation(BlueStandardGoal);
+                goal = BlueStandardGoal;
             }
 
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.cross){
                 follower.setPose(HPBlue);
-                targetingMath.setGoalLocation(BlueSpecialGoal);
+                goal = BlueSpecialGoal;
             }
 
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.triangle){
                 follower.setPose(HPRed);
-                targetingMath.setGoalLocation(RedStandardGoal);
+                goal = RedStandardGoal;
             }
 
             if(gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.circle){
                 follower.setPose(HPRed);
-                targetingMath.setGoalLocation(RedSpecialGoal);
+                goal = RedSpecialGoal;
             }
 
 
 
+            if(follower.getPose() != null && goal != null) {
+                double deltaY = (goal.getY()-follower.getPose().getY());
+                double deltaX = (goal.getX()-follower.getPose().getX());
+                if (deltaX!=0) {
+                    double goalHeadingFromRobot = Math.atan2(deltaY, deltaX);
+                    double robotHeading = follower.getHeading();
+                    turret.setPosition((180+(goalHeadingFromRobot-robotHeading))/360);
 
-            if(gamepad2.rightStickButtonWasPressed() && manualTargeting==true){
-                manualTargeting = false;
+                }
             }
-            if(gamepad2.leftStickButtonWasPressed() && manualTargeting==false){
-                manualTargeting = true;
-            }
-
-
-            //automatic hood, flywheel, and turret adjust
-            if (follower.getPose() != null && targetingMath.goal != null && manualTargeting == false){
-                turret.aimTurret(targetingMath.calculations(follower.getPose(), follower.getVelocity(), follower.getHeading())[2]);
-                shooter.aimHood(targetingMath.calculations(follower.getPose(), follower.getVelocity(), follower.getHeading())[0]);
-                shooter.setFlywheelVelocity(targetingMath.calculations(follower.getPose(), follower.getVelocity(), follower.getHeading())[1]);
-
-            }
-
-            //manual hood and flywheel adjust
-            if(manualTargeting == true){
-
-                turret.turretR1.setPosition(0.5);
 
                 if (gamepad2.dpad_down) {
-                    shooter.hood.setPosition(0.25);
+                    hood.setPosition(0.25);
                 }
 
                 if (gamepad2.dpad_right) {
-                    shooter.hood.setPosition(0.5);
+                   hood.setPosition(0.5);
                 }
 
                 if (gamepad2.dpad_up) {
-                    shooter.hood.setPosition(0.75);
+                    hood.setPosition(0.75);
                 }
 
                 if (gamepad2.dpad_left) {
-                    shooter.hood.setPosition(1);
+                    hood.setPosition(1);
                 }
 
 
 
-                if (gamepad2.square) {
-                    shooter.shooterMotor1.setVelocity(0);
-                    shooter.shooterMotor1.setVelocity(0);
+                if (gamepad2.a) {
+                    shooterMotor1.setVelocity(0);
+                    shooterMotor1.setVelocity(0);
 
                 }
 
-                if (gamepad2.cross) {
-                    shooter.shooterMotor1.setVelocity(2300);
-                    shooter.shooterMotor1.setVelocity(2300);
+                if (gamepad2.b) {
+                    shooterMotor1.setVelocity(2300);
+                    shooterMotor1.setVelocity(2300);
 
                 }
 
-                if (gamepad2.triangle) {
-                    shooter.shooterMotor1.setVelocity(1800);
-                    shooter.shooterMotor2.setVelocity(1800);
+                if (gamepad2.x) {
+                    shooterMotor1.setVelocity(1800);
+                    shooterMotor2.setVelocity(1800);
 
                 }
 
-                if (gamepad2.circle) {
-                    shooter.shooterMotor1.setVelocity(1300);
-                    shooter.shooterMotor2.setVelocity(1300);
+                if (gamepad2.y) {
+                    shooterMotor1.setVelocity(1300);
+                    shooterMotor2.setVelocity(1300);
                 }
             }
 
@@ -188,4 +174,3 @@ public class Cosmos extends LinearOpMode
         }
 
     }
-}
