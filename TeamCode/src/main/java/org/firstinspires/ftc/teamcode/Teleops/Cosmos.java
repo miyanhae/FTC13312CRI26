@@ -26,6 +26,7 @@ public class Cosmos extends LinearOpMode
     Servo gate, hood, turret;
 
     Boolean manualTargeting = false;
+    Boolean gateOpen = true;
     Pose2D goal;
 
     @Override
@@ -88,14 +89,35 @@ public class Cosmos extends LinearOpMode
             telemetry.addData("flywheel speed", shooterMotor1.getVelocity());
             telemetry.addData("hood angle", hood.getPosition());
             telemetry.addData("Turret heading", (turret.getPosition()*240)+60);
-            telemetry.addData("Robot position", pinpoint.getPosition());
+            telemetry.addData("Robot X", pinpoint.getPosX(DistanceUnit.INCH));
+            telemetry.addData("Robot Y", pinpoint.getPosY(DistanceUnit.INCH));
+            telemetry.addData("Robot Theta", pinpoint.getHeading(AngleUnit.DEGREES));
+
             telemetry.update();
 
-            //if(gamepad2.right_trigger >= 0.5){
-            //shooter.openGate();
-            //} else {
-            //shooter.closeGate();
-            //}
+
+
+            if(gamepad2.right_trigger >= 0.5 && gateOpen == false){
+                gate.setPosition(0.5);
+                gateOpen = true;
+            }
+
+            if(gamepad2.right_trigger<0.5 && gateOpen == true){
+                gate.setPosition(0);
+                gateOpen = false;
+            }
+
+
+
+            if (gamepad2.dpad_down) {
+                hood.setPosition(0.25);
+            }
+
+
+            if (gamepad2.dpad_up) {
+                hood.setPosition(0.75);
+            }
+
 
 
             //Sets up auto aim
@@ -121,15 +143,38 @@ public class Cosmos extends LinearOpMode
 
 
 
-            if(gamepad2.rightStickButtonWasPressed() && manualTargeting == false){
+            if(gamepad2.rightStickButtonWasPressed() && manualTargeting == false)
                 manualTargeting = true;
             }
 
             if(gamepad2.leftStickButtonWasPressed() && manualTargeting == true){
-            manualTargeting = false;
-        }
+                manualTargeting = false;
+            }
 
-            if(pinpoint.getPosition() != null && goal != null && manualTargeting == false) {
+
+
+            if (manualTargeting == true){
+                turret.setPosition(0.5);
+
+                if(gamepad2.a){
+                    shooterMotor1.setVelocity(2400);
+                    shooterMotor2.setVelocity(2400);
+                }
+
+                if(gamepad2.b){
+                    shooterMotor1.setVelocity(1500);
+                    shooterMotor2.setVelocity(1500);
+                }
+
+                if(gamepad2.b){
+                    shooterMotor1.setVelocity(0);
+                    shooterMotor2.setVelocity(0);
+                }
+
+            }
+
+
+            if(manualTargeting == false) {
                 double deltaY = (goal.getY(DistanceUnit.INCH)-pinpoint.getPosY(DistanceUnit.INCH));
                 double deltaX = (goal.getX(DistanceUnit.INCH)-pinpoint.getPosX(DistanceUnit.INCH));
                 if (deltaX!=0) {
@@ -138,57 +183,18 @@ public class Cosmos extends LinearOpMode
                     double turretRelativeToRobotHeading = AngleUnit.normalizeDegrees(goalHeadingFromXAxis - robotHeading - 180);
                     turret.setPosition(0.5+(turretRelativeToRobotHeading/360));
                 }
+                double hoodAngle = Math.toRadians((hood.getPosition()*25)+22.57);
+                double controlY = 31;
+                double controlRadial = 4.5;
+                double passThruAngle = -45;
+                double g = 386.09;
+                double distanceToControl = controlRadial - Math.sqrt(deltaX-controlRadial + deltaY*deltaY);
+                double flywheelLinearSpeed = Math.sqrt((g*distanceToControl*distanceToControl)/2*Math.pow(Math.cos(hoodAngle),2)*(distanceToControl * Math.tan(hoodAngle) -controlY));
+
+                shooterMotor1.setVelocity(flywheelLinearSpeed/1.26, AngleUnit.RADIANS);
+                shooterMotor2.setVelocity(flywheelLinearSpeed/1.26, AngleUnit.RADIANS);
+
+
             }
-
-            if (manualTargeting == true){
-                turret.setPosition(0.5);
-            }
-
-
-
-                if (gamepad2.dpad_down) {
-                    hood.setPosition(0.25);
-                }
-
-                if (gamepad2.dpad_right) {
-                   hood.setPosition(0.5);
-                }
-
-                if (gamepad2.dpad_up) {
-                    hood.setPosition(0.75);
-                }
-
-                if (gamepad2.dpad_left) {
-                    hood.setPosition(1);
-                }
-
-
-
-                if (gamepad2.a) {
-                    shooterMotor1.setVelocity(0);
-                    shooterMotor1.setVelocity(0);
-
-                }
-
-                if (gamepad2.b) {
-                    shooterMotor1.setVelocity(2300);
-                    shooterMotor1.setVelocity(2300);
-
-                }
-
-                if (gamepad2.x) {
-                    shooterMotor1.setVelocity(1800);
-                    shooterMotor2.setVelocity(1800);
-
-                }
-
-                if (gamepad2.y) {
-                    shooterMotor1.setVelocity(1300);
-                    shooterMotor2.setVelocity(1300);
-                }
-            }
-
-
-        }
-
     }
+}
