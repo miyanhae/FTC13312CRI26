@@ -15,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 
-@TeleOp(name = "cosmos", group = "LinearOpMode")
-public class Cosmos extends LinearOpMode {
+@TeleOp(name = "PRACTICE MATCH ONLY", group = "LinearOpMode")
+public class halfField extends LinearOpMode {
     DcMotor leftFront, leftBack, rightFront, rightBack;
     DcMotor intakeMotor, transferMotor;
     DcMotorEx shooterMotor1, shooterMotor2;
@@ -54,13 +54,11 @@ public class Cosmos extends LinearOpMode {
         shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
 
-        Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 183.25, 8.75, AngleUnit.DEGREES, 270);
+        Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 87.25, 8.75, AngleUnit.DEGREES, 270);
         Pose2D HPRed = new Pose2D(DistanceUnit.INCH, 8.75, 8.75, AngleUnit.DEGREES, 270);
 
-        Pose2D BlueStandardGoal = new Pose2D(DistanceUnit.INCH, 12, 180, AngleUnit.DEGREES, 0);
-        Pose2D BlueSpecialGoal = new Pose2D(DistanceUnit.INCH, 84, 180, AngleUnit.DEGREES, 0);
-        Pose2D RedStandardGoal = new Pose2D(DistanceUnit.INCH, 108, 180, AngleUnit.DEGREES, 0);
-        Pose2D RedSpecialGoal = new Pose2D(DistanceUnit.INCH, 180, 180, AngleUnit.DEGREES, 0);
+        Pose2D BlueStandardGoal = new Pose2D(DistanceUnit.INCH, 12, 196, AngleUnit.DEGREES, 0);
+        Pose2D RedStandardGoal = new Pose2D(DistanceUnit.INCH, 84, 196, AngleUnit.DEGREES, 0);
 
 
         waitForStart();
@@ -108,28 +106,28 @@ public class Cosmos extends LinearOpMode {
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a) {
                 pinpoint.setPosition(HPBlue);
                 goal = BlueStandardGoal;
-                goalLabel = "BlueStandardGoal";
+                goalLabel = "Blue";
                 HPLabel = "Blue";
             }
 
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.b) {
                 pinpoint.setPosition(HPBlue);
-                goal = BlueSpecialGoal;
-                goalLabel = "BlueSpecialGoal";
+                goal = BlueStandardGoal;
+                goalLabel = "Blue";
                 HPLabel = "Blue";
             }
 
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.x) {
                 pinpoint.setPosition(HPRed);
                 goal = RedStandardGoal;
-                goalLabel = "RedStandardGoal";
+                goalLabel = "Red";
                 HPLabel = "Red";
             }
 
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.y) {
                 pinpoint.setPosition(HPRed);
-                goal = RedSpecialGoal;
-                goalLabel = "RedSpecialGoal";
+                goal = RedStandardGoal;
+                goalLabel = "Red";
                 HPLabel = "Red";
             }
 
@@ -168,7 +166,7 @@ public class Cosmos extends LinearOpMode {
                     shooterMotor2.setVelocity(1500);
                 }
 
-                if (gamepad2.b) {
+                if (gamepad2.x) {
                     shooterMotor1.setVelocity(0);
                     shooterMotor2.setVelocity(0);
                 }
