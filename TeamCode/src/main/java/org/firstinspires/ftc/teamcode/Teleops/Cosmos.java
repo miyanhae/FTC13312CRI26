@@ -80,7 +80,7 @@ public class Cosmos extends LinearOpMode {
             intakeMotor.setPower(gamepad2.right_stick_y);
             transferMotor.setPower(-1 * gamepad2.left_stick_y);
 
-            telemetry.addData("flywheel speed", shooterMotor1.getVelocity());
+            telemetry.addData("flywheel speed", shooterMotor2.getVelocity());
             telemetry.addData("hood angle", hood.getPosition());
             telemetry.addData("Turret heading", turret.getPosition());
             telemetry.addData("Gate position", gate.getPosition());
@@ -92,10 +92,7 @@ public class Cosmos extends LinearOpMode {
             telemetry.addData("start zone", HPLabel);
             telemetry.addData("Manual Targeting", manualTargeting);
 
-
             telemetry.update();
-
-
 
 
             if (gamepad2.right_trigger != 0) {
@@ -103,6 +100,37 @@ public class Cosmos extends LinearOpMode {
             } else {
                 gate.setPosition(1);
             }
+
+
+
+            if (gamepad2.dpad_down) {
+                hood.setPosition(0);
+            }
+
+            if (gamepad2.dpad_up) {
+                hood.setPosition(1);
+            }
+
+
+
+            if (gamepad2.a) {
+                shooterMotor1.setVelocity(2950);
+                shooterMotor2.setVelocity(2950);
+            }
+
+            if (gamepad2.b) {
+                shooterMotor1.setVelocity(1500);
+                shooterMotor2.setVelocity(1500);
+            }
+
+            if (gamepad2.b) {
+                shooterMotor1.setVelocity(0);
+                shooterMotor2.setVelocity(0);
+            }
+
+
+
+
 
             //Sets up auto aim
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a) {
@@ -145,36 +173,7 @@ public class Cosmos extends LinearOpMode {
 
             if (manualTargeting == true) {
                 turret.setPosition(0.5);
-
-
-
-                if (gamepad2.dpad_down) {
-                    hood.setPosition(0);
-                }
-
-                if (gamepad2.dpad_up) {
-                    hood.setPosition(1);
-                }
-
-
-
-                if (gamepad2.a) {
-                    shooterMotor1.setVelocity(2400);
-                    shooterMotor2.setVelocity(2400);
-                }
-
-                if (gamepad2.b) {
-                    shooterMotor1.setVelocity(1500);
-                    shooterMotor2.setVelocity(1500);
-                }
-
-                if (gamepad2.b) {
-                    shooterMotor1.setVelocity(0);
-                    shooterMotor2.setVelocity(0);
-                }
-
             }
-
 
             if (manualTargeting == false) {
                 if (goal != null) {
@@ -187,22 +186,9 @@ public class Cosmos extends LinearOpMode {
                         double turretRelativeToRobotHeading = AngleUnit.normalizeDegrees(goalHeadingFromXAxis - robotHeading - 180);
                         turret.setPosition(0.5 + (turretRelativeToRobotHeading / 360));
                     }
-
-                    double controlY = 31;
-                    double controlRadial = 4.5;
-                    double passThruPoint = Math.toRadians(-45);
-                    double g = 386.09;
-                    double distanceToControl = Math.sqrt(deltaX * deltaX + deltaY * deltaY) - controlRadial;
-                    double hoodAngle = MathFunctions.clamp(Math.atan((2 * controlY)/(distanceToControl - Math.tan(passThruPoint))), 29.5, 56.5);
-                    double flywheelLinearSpeed = Math.sqrt((g * distanceToControl * distanceToControl) / 2 * Math.pow(Math.cos(hoodAngle), 2) * (distanceToControl * Math.tan(hoodAngle) - controlY));
-
-
-                    hood.setPosition((hoodAngle -56.5)/27);
-                    shooterMotor1.setVelocity(flywheelLinearSpeed / 1.26, AngleUnit.RADIANS);
-                    shooterMotor2.setVelocity(flywheelLinearSpeed / 1.26, AngleUnit.RADIANS);
-
                 }
             }
+
         }
     }
 }
