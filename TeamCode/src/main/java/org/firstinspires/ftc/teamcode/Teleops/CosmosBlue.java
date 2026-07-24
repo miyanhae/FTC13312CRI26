@@ -15,16 +15,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 
-@TeleOp(name = "cosmos", group = "LinearOpMode")
-public class Cosmos extends LinearOpMode {
+@TeleOp(name = "cosmosBlue", group = "LinearOpMode")
+public class CosmosBlue extends LinearOpMode {
     DcMotor leftFront, leftBack, rightFront, rightBack;
     DcMotor intakeMotor, transferMotor;
     DcMotorEx shooterMotor1, shooterMotor2;
     Servo hood, gate, turret;
 
-    public double highVelocity = 1400;
-    public double lowVelocity = 2400;
-    public double curTargetVelocity;
+    public double lowVelocity = 1400;
+    public double mediumVelocity = 1800;
+    public double highVelocity = 2800;
 
     Boolean manualTargeting = true;
     Pose2D goal;
@@ -63,12 +63,8 @@ public class Cosmos extends LinearOpMode {
 
 
         Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 183.25, 8.75, AngleUnit.DEGREES, 270);
-        Pose2D HPRed = new Pose2D(DistanceUnit.INCH, 8.75, 8.75, AngleUnit.DEGREES, 270);
-
         Pose2D BlueStandardGoal = new Pose2D(DistanceUnit.INCH, 12, 180, AngleUnit.DEGREES, 0);
         Pose2D BlueSpecialGoal = new Pose2D(DistanceUnit.INCH, 84, 180, AngleUnit.DEGREES, 0);
-        Pose2D RedStandardGoal = new Pose2D(DistanceUnit.INCH, 108, 180, AngleUnit.DEGREES, 0);
-        Pose2D RedSpecialGoal = new Pose2D(DistanceUnit.INCH, 180, 180, AngleUnit.DEGREES, 0);
 
 
         waitForStart();
@@ -80,10 +76,19 @@ public class Cosmos extends LinearOpMode {
             double lbPower = Range.clip(-1 * gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x, -1, 1);
             double rbPower = Range.clip(-1 * gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x, -1, 1);
 
-            leftFront.setPower(lfPower);
-            leftBack.setPower(lbPower);
-            rightFront.setPower(rfPower);
-            rightBack.setPower(rbPower);
+            double precision = 1;
+            if (gamepad1.left_bumper){
+                precision = 0.25;
+            }
+
+            if (gamepad1.right_bumper){
+                precision = 1;
+            }
+
+            leftFront.setPower(lfPower * precision);
+            leftBack.setPower(lbPower * precision);
+            rightFront.setPower(rfPower * precision);
+            rightBack.setPower(rbPower * precision);
 
             intakeMotor.setPower(gamepad2.right_stick_y);
             transferMotor.setPower(-1 * gamepad2.left_stick_y);
@@ -121,19 +126,25 @@ public class Cosmos extends LinearOpMode {
 
 
 
-            if (gamepad2.yWasPressed()) {
-                if (curTargetVelocity == highVelocity) {
-                    curTargetVelocity = lowVelocity;
-                } else {
-                    curTargetVelocity = highVelocity;
-                }
-
-                shooterMotor1.setVelocity(curTargetVelocity);
-                shooterMotor2.setVelocity(curTargetVelocity);
-
+            if (gamepad2.a) {
+                shooterMotor1.setVelocity(lowVelocity);
+                shooterMotor2.setVelocity(lowVelocity);
             }
 
+            if (gamepad2.b) {
+                shooterMotor1.setVelocity(mediumVelocity);
+                shooterMotor2.setVelocity(mediumVelocity);
+            }
 
+            if (gamepad2.x){
+                shooterMotor1.setVelocity(highVelocity);
+                shooterMotor2.setVelocity(highVelocity);
+            }
+
+            if (gamepad2.y){
+                shooterMotor1.setVelocity(0);
+                shooterMotor2.setVelocity(0);
+            }
 
 
             //Sets up auto aim
@@ -151,19 +162,6 @@ public class Cosmos extends LinearOpMode {
                 HPLabel = "Blue";
             }
 
-            if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.x) {
-                pinpoint.setPosition(HPRed);
-                goal = RedStandardGoal;
-                goalLabel = "RedStandardGoal";
-                HPLabel = "Red";
-            }
-
-            if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.y) {
-                pinpoint.setPosition(HPRed);
-                goal = RedSpecialGoal;
-                goalLabel = "RedSpecialGoal";
-                HPLabel = "Red";
-            }
 
 
             if (gamepad2.rightStickButtonWasPressed() && manualTargeting == false) {
