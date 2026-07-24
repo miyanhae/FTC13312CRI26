@@ -15,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 
-@TeleOp(name = "cosmos", group = "LinearOpMode")
-public class Cosmos extends LinearOpMode {
+@TeleOp(name = "AutoAimTest", group = "LinearOpMode")
+public class AutoAim extends LinearOpMode {
     DcMotor leftFront, leftBack, rightFront, rightBack;
     DcMotor intakeMotor, transferMotor;
     DcMotorEx shooterMotor1, shooterMotor2;
@@ -58,17 +58,16 @@ public class Cosmos extends LinearOpMode {
         shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(-39.61, 0, 0, -11.61);
-        shooterMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        shooterMotor1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         shooterMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
 
-        Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 183.25, 8.75, AngleUnit.DEGREES, 270);
+
+        Pose2D HPBlue = new Pose2D(DistanceUnit.INCH, 87.25, 8.75, AngleUnit.DEGREES, 270);
         Pose2D HPRed = new Pose2D(DistanceUnit.INCH, 8.75, 8.75, AngleUnit.DEGREES, 270);
 
-        Pose2D BlueStandardGoal = new Pose2D(DistanceUnit.INCH, 12, 180, AngleUnit.DEGREES, 0);
-        Pose2D BlueSpecialGoal = new Pose2D(DistanceUnit.INCH, 84, 180, AngleUnit.DEGREES, 0);
-        Pose2D RedStandardGoal = new Pose2D(DistanceUnit.INCH, 108, 180, AngleUnit.DEGREES, 0);
-        Pose2D RedSpecialGoal = new Pose2D(DistanceUnit.INCH, 180, 180, AngleUnit.DEGREES, 0);
+        Pose2D BlueStandardGoal = new Pose2D(DistanceUnit.INCH, 12, 196, AngleUnit.DEGREES, 0);
+        Pose2D RedStandardGoal = new Pose2D(DistanceUnit.INCH, 84, 196, AngleUnit.DEGREES, 0);
 
 
         waitForStart();
@@ -100,7 +99,6 @@ public class Cosmos extends LinearOpMode {
             telemetry.addData("start zone", HPLabel);
             telemetry.addData("Manual Targeting", manualTargeting);
 
-            telemetry.update();
 
 
             if (gamepad2.right_trigger != 0) {
@@ -121,47 +119,32 @@ public class Cosmos extends LinearOpMode {
 
 
 
-            if (gamepad2.yWasPressed()) {
-                if (curTargetVelocity == highVelocity) {
-                    curTargetVelocity = lowVelocity;
-                } else {
-                    curTargetVelocity = highVelocity;
-                }
-
-                shooterMotor1.setVelocity(curTargetVelocity);
-                shooterMotor2.setVelocity(curTargetVelocity);
-
-            }
-
-
-
-
             //Sets up auto aim
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.a) {
                 pinpoint.setPosition(HPBlue);
                 goal = BlueStandardGoal;
-                goalLabel = "BlueStandardGoal";
+                goalLabel = "Blue";
                 HPLabel = "Blue";
             }
 
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.b) {
                 pinpoint.setPosition(HPBlue);
-                goal = BlueSpecialGoal;
-                goalLabel = "BlueSpecialGoal";
+                goal = BlueStandardGoal;
+                goalLabel = "Blue";
                 HPLabel = "Blue";
             }
 
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.x) {
                 pinpoint.setPosition(HPRed);
                 goal = RedStandardGoal;
-                goalLabel = "RedStandardGoal";
+                goalLabel = "Red";
                 HPLabel = "Red";
             }
 
             if (gamepad2.right_bumper && gamepad2.left_bumper && gamepad2.y) {
                 pinpoint.setPosition(HPRed);
-                goal = RedSpecialGoal;
-                goalLabel = "RedSpecialGoal";
+                goal = RedStandardGoal;
+                goalLabel = "Red";
                 HPLabel = "Red";
             }
 
@@ -177,6 +160,18 @@ public class Cosmos extends LinearOpMode {
 
             if (manualTargeting == true) {
                 turret.setPosition(0.5);
+
+                if (gamepad2.yWasPressed()) {
+                    if (curTargetVelocity == highVelocity) {
+                        curTargetVelocity = lowVelocity;
+                    } else {
+                        curTargetVelocity = highVelocity;
+                    }
+
+                    shooterMotor1.setVelocity(curTargetVelocity);
+                    shooterMotor2.setVelocity(curTargetVelocity);
+
+                }
             }
 
             if (manualTargeting == false) {
@@ -190,9 +185,26 @@ public class Cosmos extends LinearOpMode {
                         double turretRelativeToRobotHeading = AngleUnit.normalizeDegrees(goalHeadingFromXAxis - robotHeading - 180);
                         turret.setPosition(0.5 + (turretRelativeToRobotHeading / 360));
                     }
+
+                    double goalHeight = 26.5;
+                    double distanceToGoal = Math.sqrt(deltaX*deltaX+deltaY*deltaY);
+                    double g = 386.09;
+                    double hoodAngle = Math.toRadians((hood.getPosition()*27)+29.5);
+                    double ballLinearVelocity = Math.sqrt((g * distanceToGoal * distanceToGoal) /(2 * Math.pow(Math.cos(hoodAngle), 2) * (distanceToGoal * Math.tan(hoodAngle) - goalHeight)));
+                    double ballMass = 0.156;
+                    double flywheelRadius = 1.26;
+                    double flywheelMass = 1.22;
+
+                    double flywheelAngularVelocity = (flywheelRadius * ballMass * ballLinearVelocity)/(flywheelMass/2 * flywheelRadius * flywheelRadius);
+
+                    shooterMotor1.setVelocity(flywheelAngularVelocity, AngleUnit.RADIANS);
+                    shooterMotor2.setVelocity(flywheelAngularVelocity, AngleUnit.RADIANS);
+
+                    telemetry.addData("Flywheel calc", flywheelAngularVelocity);
+                    telemetry.addData("Ball velocity", ballLinearVelocity);
                 }
             }
-
+telemetry.update();
         }
     }
 }
