@@ -14,8 +14,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous (name="BlueClose", group="Linear OpMode")
-public class blueClose extends  LinearOpMode {
+@Autonomous (name="redClose", group="Linear OpMode")
+public class redClose extends  LinearOpMode {
 
 
     private DcMotorEx shooterMotor1, shooterMotor2;
@@ -54,18 +54,18 @@ public class blueClose extends  LinearOpMode {
 
 
     //all the poses the robot will be in when something happens
-    private final Pose startPos = new Pose(19.5, 167, Math.toRadians(324));
-    private final Pose shortShot = new Pose(36, 154, Math.toRadians(315));
-    private final Pose mediumShot = new Pose(72, 118, Math.toRadians(315));
+    private final Pose startPos = new Pose(192-19.5, 167, Math.toRadians(216));
+    private final Pose shortShot = new Pose(192-36, 154, Math.toRadians(225));
+    private final Pose mediumShot = new Pose(192-72, 118, Math.toRadians(225));
 
-    private final Pose pickup1 = new Pose(12, 106, Math.toRadians(180));
-    private final Pose pickup2 = new Pose(4, 82, Math.toRadians(180));
-    private final Pose classifierGate = new Pose(11, 105, Math.toRadians(120));
+    private final Pose pickup1 = new Pose(192-12, 106, Math.toRadians(180));
+    private final Pose pickup2 = new Pose(192-4, 82, Math.toRadians(180));
+    private final Pose classifierGate = new Pose(192-11, 105, Math.toRadians(60));
 
-    private final Pose control1 = new Pose(80, 112, Math.toRadians(180));
-    private final Pose control2 = new Pose(60, 80, Math.toRadians(180));
+    private final Pose control1 = new Pose(192-80, 112, Math.toRadians(180));
+    private final Pose control2 = new Pose(192-60, 80, Math.toRadians(180));
 
-    private final Pose endPose = new Pose(60, 80, Math.toRadians(270));
+    private final Pose endPose = new Pose(192-60, 80, Math.toRadians(270));
 
 
 

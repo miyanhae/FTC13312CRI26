@@ -14,8 +14,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous (name="BlueClose", group="Linear OpMode")
-public class blueClose extends  LinearOpMode {
+@Autonomous (name="redHP", group="Linear OpMode")
+public class redHP extends LinearOpMode {
 
 
     private DcMotorEx shooterMotor1, shooterMotor2;
@@ -30,21 +30,25 @@ public class blueClose extends  LinearOpMode {
         startPosToShootPos,
         shootPreload,
 
-        pickupSpike1,
+        pickupSpike3,
         returnShootPos1,
         shootRound1,
 
-        pickupSpike2,
+        pickupHP1,
         returnShootPos2,
         shootRound2,
 
-        pickupAtGate1,
+        pickupHP2,
         returnShootPos3,
         shootRound3,
 
-        pickupAtGate2,
+        pickupHP3,
         returnShootPos4,
         shootRound4,
+
+        pickupHP4,
+        returnShootPos5,
+        shootRound5,
 
         toEndPose
     }
@@ -54,82 +58,57 @@ public class blueClose extends  LinearOpMode {
 
 
     //all the poses the robot will be in when something happens
-    private final Pose startPos = new Pose(19.5, 167, Math.toRadians(324));
-    private final Pose shortShot = new Pose(36, 154, Math.toRadians(315));
-    private final Pose mediumShot = new Pose(72, 118, Math.toRadians(315));
+    private final Pose startPos = new Pose(192-82, 9, Math.toRadians(270));
+    private final Pose farShot = new Pose(192-82, 60, Math.toRadians(240));
 
-    private final Pose pickup1 = new Pose(12, 106, Math.toRadians(180));
-    private final Pose pickup2 = new Pose(4, 82, Math.toRadians(180));
-    private final Pose classifierGate = new Pose(11, 105, Math.toRadians(120));
+    private final Pose pickup3 = new Pose(192-12, 60, Math.toRadians(180));
+    private final Pose pickupHP = new Pose(192-9, 12, Math.toRadians(180));
 
-    private final Pose control1 = new Pose(80, 112, Math.toRadians(180));
-    private final Pose control2 = new Pose(60, 80, Math.toRadians(180));
+    private final Pose controlHPandFar = new Pose(192-60, 9, Math.toRadians(180));
 
-    private final Pose endPose = new Pose(60, 80, Math.toRadians(270));
-
-
+    private final Pose endPose = new Pose(192-48, 24, Math.toRadians(270));
 
 
     //these are the paths the robot will follow, one pose to another
     private PathChain
-            startToShortShot,
-            shortShotToP1,
-            p1ToMediumShot,
-            mediumShotToP2,
-            p2ToMediumShot,
-            mediumShotToGate,
-            gateToMediumShot,
-            mediumShotToEnd;
-
+            startToFarShot,
+            farShotToP3,
+            p3ToFarShot,
+            farShotToHP,
+            hpToFarShot,
+            farShotToEnd;
 
     public void buildPaths() {
-        startToShortShot = follower.pathBuilder()
-                .addPath(new BezierLine(startPos, shortShot))
-                .setLinearHeadingInterpolation(startPos.getHeading(), shortShot.getHeading())
+        startToFarShot = follower.pathBuilder()
+                .addPath(new BezierLine(startPos, farShot))
+                .setLinearHeadingInterpolation(startPos.getHeading(), farShot.getHeading())
                 .build();
 
-        shortShotToP1 = follower.pathBuilder()
-                .addPath(new BezierCurve(shortShot, pickup1, control1))
+        farShotToP3 = follower.pathBuilder()
+                .addPath(new BezierLine(farShot, pickup3))
+                .setLinearHeadingInterpolation(farShot.getHeading(), pickup3.getHeading())
+                .build();
+
+        p3ToFarShot = follower.pathBuilder()
+                .addPath(new BezierLine(pickup3, farShot))
+                .setLinearHeadingInterpolation(pickup3.getHeading(), farShot.getHeading())
+                .build();
+
+        farShotToHP = follower.pathBuilder()
+                .addPath(new BezierCurve(farShot, pickupHP, controlHPandFar))
                 .setTangentHeadingInterpolation()
                 .build();
 
-
-        p1ToMediumShot = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1, mediumShot))
-                .setLinearHeadingInterpolation(pickup1.getHeading(), mediumShot.getHeading())
-                .build();
-
-
-        mediumShotToP2 = follower.pathBuilder()
-                .addPath(new BezierCurve(mediumShot, pickup2, control2))
+        hpToFarShot = follower.pathBuilder()
+                .addPath(new BezierCurve(pickupHP, farShot, controlHPandFar))
                 .setTangentHeadingInterpolation()
                 .build();
 
-
-        p2ToMediumShot = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2, mediumShot))
-                .setLinearHeadingInterpolation(pickup2.getHeading(), mediumShot.getHeading())
-                .build();
-
-        mediumShotToGate = follower.pathBuilder()
-                .addPath(new BezierLine(mediumShot, classifierGate))
-                .setLinearHeadingInterpolation(mediumShot.getHeading(), classifierGate.getHeading())
-                .build();
-
-        gateToMediumShot = follower.pathBuilder()
-                .addPath(new BezierLine(classifierGate, mediumShot))
-                .setLinearHeadingInterpolation(classifierGate.getHeading(), mediumShot.getHeading())
-                .build();
-
-        mediumShotToEnd = follower.pathBuilder()
-                .addPath(new BezierLine(mediumShot, endPose))
-                .setTangentHeadingInterpolation()
+        farShotToEnd = follower.pathBuilder()
+                .addPath(new BezierLine(farShot, endPose))
+                .setLinearHeadingInterpolation(farShot.getHeading(), endPose.getHeading())
                 .build();
     }
-
-
-
-
 
 
 //this is what will activate each path and action in a sequence after it is called
@@ -140,114 +119,111 @@ public class blueClose extends  LinearOpMode {
 
 
             case startPosToShootPos:
-
                 gate.setPosition(0.4);
-                hood.setPosition(0);
+                hood.setPosition(1);
                 turret.setPosition(0.5);
+                shooterMotor1.setVelocity(2800);
+                shooterMotor2.setVelocity(2800);
 
-                shooterMotor1.setVelocity(1400);
-                shooterMotor2.setVelocity(1400);
-
-                follower.followPath(startToShortShot, true);
+                follower.followPath(startToFarShot, true);
                 pathState = PathState.shootPreload;
 
             case shootPreload:
                 if (!follower.isBusy()) {
                     Shoot();
-                    pathState = PathState.pickupSpike1;
+                    pathState = PathState.pickupSpike3;
                 }
 
 
-
-            case pickupSpike1:
+            case pickupSpike3:
                 if (!follower.isBusy()) {
-                    follower.followPath(shortShotToP1, true);
-                    intakeMotor.setPower(1);
+                    follower.followPath(farShotToP3);
                     pathState = PathState.returnShootPos1;
                 }
 
-
             case returnShootPos1:
                 if (!follower.isBusy()) {
-                    follower.followPath(p1ToMediumShot, true);
+                    follower.followPath(p3ToFarShot);
                     pathState = PathState.shootRound1;
                 }
 
-
             case shootRound1:
                 if (!follower.isBusy()) {
-                    //turret.setPosition();
-                    shooterMotor1.setVelocity(1800);
-                    shooterMotor2.setVelocity(1800);
                     Shoot();
-                    pathState = PathState.pickupSpike2;
+                    pathState = PathState.pickupHP1;
                 }
 
 
-
-            case pickupSpike2:
+            case pickupHP1:
                 if (!follower.isBusy()) {
-                    follower.followPath(mediumShotToP2, true);
-                    intakeMotor.setPower(1);
+                    follower.followPath(farShotToHP);
                     pathState = PathState.returnShootPos2;
                 }
 
-
             case returnShootPos2:
                 if (!follower.isBusy()) {
-                    follower.followPath(p2ToMediumShot, true);
+                    follower.followPath(hpToFarShot);
                     pathState = PathState.shootRound2;
                 }
-
 
             case shootRound2:
                 if (!follower.isBusy()) {
                     Shoot();
-                    pathState = PathState.pickupAtGate1;
+                    pathState = PathState.pickupHP3;
                 }
 
 
-
-            case pickupAtGate1:
+            case pickupHP2:
                 if (!follower.isBusy()) {
-                    follower.followPath(mediumShotToGate, true);
-                    intakeMotor.setPower(1);
-                    sleep(300);
+                    follower.followPath(farShotToHP);
                     pathState = PathState.returnShootPos3;
                 }
 
-
             case returnShootPos3:
                 if (!follower.isBusy()) {
-                    follower.followPath(gateToMediumShot, true);
+                    follower.followPath(hpToFarShot);
                     pathState = PathState.shootRound3;
                 }
-
 
             case shootRound3:
                 if (!follower.isBusy()) {
                     Shoot();
-                    pathState = PathState.pickupAtGate1;
+                    pathState = PathState.pickupHP3;
                 }
 
 
-            case pickupAtGate2:
+            case pickupHP3:
                 if (!follower.isBusy()) {
-                    follower.followPath(mediumShotToGate, true);
-                    intakeMotor.setPower(1);
-                    sleep(300);
+                    follower.followPath(farShotToHP);
                     pathState = PathState.returnShootPos4;
                 }
 
-
             case returnShootPos4:
                 if (!follower.isBusy()) {
-                    follower.followPath(gateToMediumShot, true);
+                    follower.followPath(hpToFarShot);
                     pathState = PathState.shootRound4;
                 }
 
-
             case shootRound4:
+                if (!follower.isBusy()) {
+                    Shoot();
+                    pathState = PathState.pickupHP4;
+                }
+
+
+            case pickupHP4:
+                if (!follower.isBusy()) {
+                    follower.followPath(farShotToHP);
+                    pathState = PathState.returnShootPos5;
+                }
+
+            case returnShootPos5:
+                if (!follower.isBusy()) {
+                    follower.followPath(hpToFarShot);
+                    pathState = PathState.shootRound5;
+                }
+
+            case shootRound5:
                 if (!follower.isBusy()) {
                     Shoot();
                     pathState = PathState.toEndPose;
@@ -255,14 +231,15 @@ public class blueClose extends  LinearOpMode {
 
 
             case toEndPose:
-                if (!follower.isBusy()){
-                    follower.followPath(mediumShotToEnd, true);
+                if (!follower.isBusy()) {
+                    follower.followPath(farShotToEnd, true);
                 }
 
         }
     }
 
-    public void Shoot(){
+
+    public void Shoot() {
         for (int i = 0; i <= 3; i++) {
             gate.setPosition(0.4);
 
@@ -270,7 +247,7 @@ public class blueClose extends  LinearOpMode {
             sleep(250);
             intakeMotor.setPower(0);
 
-            if(i != 3) {
+            if (i != 3) {
                 sleep(300);
             }
 
@@ -279,7 +256,6 @@ public class blueClose extends  LinearOpMode {
         gate.setPosition(1);
 
     }
-
 
 
     @Override
@@ -303,7 +279,6 @@ public class blueClose extends  LinearOpMode {
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(-39.61, 0, 0, -11.61);
         shooterMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         shooterMotor2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-
 
 
         buildPaths();

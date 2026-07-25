@@ -174,7 +174,16 @@ public class CosmosBlue extends LinearOpMode {
 
 
             if (manualTargeting == true) {
-                turret.setPosition(0.5);
+                if(gamepad1.x){
+                    turret.setPosition(0.4167);
+                    //150
+                } else if (gamepad1.b) {
+                    //210
+                    turret.setPosition(0.5833);
+                } else {
+                    //180
+                    turret.setPosition(0.5);
+                }
             }
 
             if (manualTargeting == false) {

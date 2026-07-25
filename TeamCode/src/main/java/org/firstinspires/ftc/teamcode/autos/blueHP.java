@@ -58,15 +58,15 @@ public class blueHP extends LinearOpMode {
 
 
     //all the poses the robot will be in when something happens
-    private final Pose startPos = new Pose(19, 124, Math.toRadians(325));
-    private final Pose farShot = new Pose(28, 115, Math.toRadians(315));
+    private final Pose startPos = new Pose(82, 9, Math.toRadians(270));
+    private final Pose farShot = new Pose(82, 60, Math.toRadians(300));
 
-    private final Pose pickup3 = new Pose(16, 84, Math.toRadians(180));
-    private final Pose pickupHP = new Pose(16, 84, Math.toRadians(180));
+    private final Pose pickup3 = new Pose(12, 60, Math.toRadians(180));
+    private final Pose pickupHP = new Pose(9, 12, Math.toRadians(180));
 
-    private final Pose control1 = new Pose(54, 36, Math.toRadians(180));
+    private final Pose controlHPandFar = new Pose(60, 9, Math.toRadians(180));
 
-    private final Pose endPose = new Pose(60, 120, Math.toRadians(270));
+    private final Pose endPose = new Pose(48, 24, Math.toRadians(270));
 
 
     //these are the paths the robot will follow, one pose to another
@@ -85,23 +85,23 @@ public class blueHP extends LinearOpMode {
                 .build();
 
         farShotToP3 = follower.pathBuilder()
-                .addPath(new BezierCurve(farShot, pickup3, control1))
-                .setTangentHeadingInterpolation()
+                .addPath(new BezierLine(farShot, pickup3))
+                .setLinearHeadingInterpolation(farShot.getHeading(), pickup3.getHeading())
                 .build();
 
         p3ToFarShot = follower.pathBuilder()
-                .addPath(new BezierCurve(pickup3, farShot, control1))
-                .setTangentHeadingInterpolation()
+                .addPath(new BezierLine(pickup3, farShot))
+                .setLinearHeadingInterpolation(pickup3.getHeading(), farShot.getHeading())
                 .build();
 
         farShotToHP = follower.pathBuilder()
-                .addPath(new BezierLine(farShot, pickupHP))
-                .setLinearHeadingInterpolation(farShot.getHeading(), pickupHP.getHeading())
+                .addPath(new BezierCurve(farShot, pickupHP, controlHPandFar))
+                .setTangentHeadingInterpolation()
                 .build();
 
         hpToFarShot = follower.pathBuilder()
-                .addPath(new BezierLine(pickupHP, farShot))
-                .setLinearHeadingInterpolation(pickupHP.getHeading(), farShot.getHeading())
+                .addPath(new BezierCurve(pickupHP, farShot, controlHPandFar))
+                .setTangentHeadingInterpolation()
                 .build();
 
         farShotToEnd = follower.pathBuilder()
@@ -120,8 +120,8 @@ public class blueHP extends LinearOpMode {
 
             case startPosToShootPos:
                 gate.setPosition(0.4);
-                hood.setPosition(0);
-                //turret.setPosition();
+                hood.setPosition(1);
+                turret.setPosition(0.5);
                 shooterMotor1.setVelocity(2800);
                 shooterMotor2.setVelocity(2800);
 
